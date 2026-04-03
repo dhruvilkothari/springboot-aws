@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -34,5 +35,14 @@ public class UserService {
 
         userRepository.save(userEntity);
         return  new ResponseEntity<>(userDto, HttpStatus.CREATED);
+    }
+
+    public ResponseEntity<UserDto> getUserById(Long id) {
+        Optional<UserEntity> userEntity = userRepository.findById(id);
+        if(userEntity.isEmpty()){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        UserDto userDto = modelMapper.map(userEntity.get(), UserDto.class);
+        return  new ResponseEntity<>(userDto, HttpStatus.FOUND);
     }
 }
