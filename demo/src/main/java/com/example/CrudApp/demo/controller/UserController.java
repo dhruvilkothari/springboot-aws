@@ -15,12 +15,12 @@ public class UserController {
     private final UserService userService;
 
 
-    @GetMapping("")
+    @GetMapping("/getAllUsers")
     public ResponseEntity<List<UserDto>> getAllUsers(){
         return userService.getAllUsers();
     }
 
-    @PostMapping("")
+    @PostMapping("/create")
     public ResponseEntity<UserDto> createUser(@RequestBody(required = true) UserDto userDto){
         return userService.createUser(userDto);
     }
