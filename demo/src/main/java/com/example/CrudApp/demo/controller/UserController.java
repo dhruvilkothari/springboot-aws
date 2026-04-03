@@ -1,6 +1,7 @@
 package com.example.CrudApp.demo.controller;
 
 import com.example.CrudApp.demo.dto.UserDto;
+import com.example.CrudApp.demo.response.ApiResponse;
 import com.example.CrudApp.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +17,16 @@ public class UserController {
 
 
     @GetMapping("/getAllUsers")
-    public ResponseEntity<List<UserDto>> getAllUsers(){
+    public ResponseEntity<ApiResponse<Object>> getAllUsers(){
         return userService.getAllUsers();
     }
 
     @PostMapping("/create")
-    public ResponseEntity<UserDto> createUser(@RequestBody(required = true) UserDto userDto){
+    public ResponseEntity<ApiResponse<Object>> createUser(@RequestBody(required = true) UserDto userDto){
         return userService.createUser(userDto);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<Object>> getUserById(@PathVariable Long id){
         return userService.getUserById(id);
     }
 

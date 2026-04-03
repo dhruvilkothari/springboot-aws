@@ -2,7 +2,10 @@ package com.example.CrudApp.demo.service;
 
 import com.example.CrudApp.demo.dto.UserDto;
 import com.example.CrudApp.demo.entity.UserEntity;
+import com.example.CrudApp.demo.exeception.ResourceNotFoundException;
 import com.example.CrudApp.demo.repository.UserRepository;
+import com.example.CrudApp.demo.response.ApiResponse;
+import com.example.CrudApp.demo.util.Argon2Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -21,28 +24,33 @@ public class UserService {
     private final ModelMapper modelMapper;
 
 
-    public ResponseEntity<List<UserDto>> getAllUsers() {
+    public ResponseEntity<ApiResponse<Object>> getAllUsers() {
 
         List<UserEntity> userEntities  = userRepository.findAll();
         List<UserDto> userDtos = userEntities.stream()
                 .map(userEntity -> modelMapper.map(userEntity, UserDto.class)).toList();
 
-        return new ResponseEntity<>(userDtos, HttpStatus.OK);
+        ApiResponse<Object> apiResponse = new ApiResponse<>(true, "Got All Users", userDtos, null);
+        return ResponseEntity.ok(apiResponse);
     }
 
-    public ResponseEntity<UserDto> createUser(UserDto userDto){
+    public ResponseEntity<ApiResponse<Object>> createUser(UserDto userDto){
         UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
+        String hashedPassword = Argon2Util.hash(userDto.getPassword());
+        userEntity.setPassword(hashedPassword);
 
         userRepository.save(userEntity);
-        return  new ResponseEntity<>(userDto, HttpStatus.CREATED);
+        ApiResponse<Object>apiResponse = new ApiResponse<>(true, "User Created", userDto, null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+
     }
 
-    public ResponseEntity<UserDto> getUserById(Long id) {
+    public ResponseEntity<ApiResponse<Object>> getUserById(Long id) {
         Optional<UserEntity> userEntity = userRepository.findById(id);
         if(userEntity.isEmpty()){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new ResourceNotFoundException("User not found with id: " + id);
         }
         UserDto userDto = modelMapper.map(userEntity.get(), UserDto.class);
-        return  new ResponseEntity<>(userDto, HttpStatus.FOUND);
+        return  ResponseEntity.ok(new ApiResponse<>(true, "User Found With Given Id", userDto, null));
     }
 }
