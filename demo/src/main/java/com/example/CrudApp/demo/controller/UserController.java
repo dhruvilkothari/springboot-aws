@@ -3,6 +3,7 @@ package com.example.CrudApp.demo.controller;
 import com.example.CrudApp.demo.dto.UserDto;
 import com.example.CrudApp.demo.response.ApiResponse;
 import com.example.CrudApp.demo.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,14 @@ public class UserController {
         return userService.createUser(userDto);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Object>> getUserById(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<Object>> getUserById(@PathVariable Long id, HttpServletRequest request){
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+
+        String token = authHeader.substring(7); // remove "Bearer "
+        System.out.println("Token received: " + token);
         return userService.getUserById(id);
     }
 
